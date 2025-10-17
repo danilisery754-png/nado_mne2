@@ -7,54 +7,23 @@
     <script>
         const VK_VIDEO_ID = "-213216528_456256139";
         
-        function ultraDesktopForce() {
-            // ✅ Все возможные параметры для ПК-версии
-            const params = [
-                'from=desktop',
-                'mobile=0', 
-                'force_desktop=1',
-                'no_mobile_redirect=1',
-                'platform=desktop',
-                'view=desktop',
-                'version=full',
-                'layout=desktop',
-                'ui=desktop',
-                'redirect=no',
-                'app=0',
-                'm=0'
-            ].join('&');
+        function finalAttempt() {
+            // ✅ Пробуем разные desktop URL
+            const urls = [
+                `https://vk.ru/video${VK_VIDEO_ID}?from=desktop&mobile=0`,
+                `https://www.vk.ru/video${VK_VIDEO_ID}?nomobile=1`,
+                `https://vk.ru/video${VK_VIDEO_ID}?force_desktop=1&no_mobile=1`
+            ];
             
-            const desktopUrl = `https://vk.com/video${VK_VIDEO_ID}?${params}`;
-            const timestamp = Date.now();
-            const finalUrl = `${desktopUrl}&t=${timestamp}&r=${Math.random()}`;
+            const randomUrl = urls[Math.floor(Math.random() * urls.length)];
+            const finalUrl = randomUrl + `&t=${Date.now()}`;
             
-            // ✅ Создаем скрытую страницу с десктопными настройками
-            const hiddenPage = window.open('', '_blank');
-            if (hiddenPage) {
-                hiddenPage.document.write(`
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <meta name="viewport" content="width=1200">
-                        <script>
-                            window.location.replace('${finalUrl}');
-                        <\/script>
-                    </head>
-                    <body>
-                        <p>Загрузка ПК-версии...</p>
-                    </body>
-                    </html>
-                `);
-                window.close();
-            } else {
-                // ✅ Обычный редирект если popup заблокирован
-                window.location.replace(finalUrl);
-            }
+            // ✅ Простой и жесткий редирект
+            window.location.href = finalUrl;
         }
         
-        // ✅ Мгновенный запуск
-        window.onload = ultraDesktopForce;
-        setTimeout(ultraDesktopForce, 10);
+        // ✅ Только одна попытка - иногда меньше = лучше
+        setTimeout(finalAttempt, 1);
         
     </script>
 </head>
