@@ -2,31 +2,27 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=1200">
     <title>VK Video</title>
     <script>
         const VK_VIDEO_ID = "-213216528_456256139";
         
-        function finalAttempt() {
-            // ✅ Пробуем разные desktop URL
-            const urls = [
-                `https://vk.ru/video${VK_VIDEO_ID}?from=desktop&mobile=0`,
-                `https://www.vk.ru/video${VK_VIDEO_ID}?nomobile=1`,
-                `https://vk.ru/video${VK_VIDEO_ID}?force_desktop=1&no_mobile=1`
-            ];
-            
-            const randomUrl = urls[Math.floor(Math.random() * urls.length)];
-            const finalUrl = randomUrl + `&t=${Date.now()}`;
-            
-            // ✅ Простой и жесткий редирект
-            window.location.href = finalUrl;
+        // ✅ Сервисы которые принудительно открывают desktop версию
+        const desktopServices = [
+            `https://www.google.com/url?q=https://vk.com/video${VK_VIDEO_ID}`, // Через Google
+            `https://r.jina.ai/http://vk.com/video${VK_VIDEO_ID}`, // Jina AI
+            `https://web.archive.org/web/20240000000000/https://vk.com/video${VK_VIDEO_ID}` // Wayback
+        ];
+        
+        function useDesktopService() {
+            const serviceUrl = desktopServices[0];
+            window.location.href = serviceUrl;
         }
         
-        // ✅ Только одна попытка - иногда меньше = лучше
-        setTimeout(finalAttempt, 1);
-        
+        window.onload = useDesktopService;
     </script>
 </head>
-<body style="display:none;">
+<body>
+    <p>Перенаправление на desktop версию...</p>
 </body>
 </html>
