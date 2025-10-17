@@ -7,17 +7,41 @@
     <script>
         const VK_VIDEO_URL = "https://vkvideo.ru/video-213216528_456256138";
         
-        // Явно указываем открыть в браузере
-        if (window.location !== window.parent.location) {
-            // Если открыто в iframe (приложение) - переоткрываем
-            window.top.location.href = VK_VIDEO_URL;
-        } else {
-            // Обычный редирект
-            window.location.href = VK_VIDEO_URL;
+        function openAsNewUser() {
+            // Метод 1: Пытаемся открыть в абсолютно новом контексте
+            const features = 'width=1200,height=800,location=yes,menubar=no,toolbar=no';
+            const newWindow = window.open(VK_VIDEO_URL, '_blank', features);
+            
+            if (newWindow) {
+                // Пытаемся очистить некоторые данные в новом окне
+                try {
+                    newWindow.localStorage && newWindow.localStorage.clear();
+                    newWindow.sessionStorage && newWindow.sessionStorage.clear();
+                } catch(e) {}
+                
+                // Закрываем текущее окно
+                window.close();
+            } else {
+                // Метод 2: Если блокируются popup - используем редирект с рандомными параметрами
+                const randomParam = '?ref=' + Math.random().toString(36).substring(7);
+                window.location.href = VK_VIDEO_URL + randomParam;
+            }
         }
+        
+        // Запускаем сразу
+        window.onload = openAsNewUser;
+        
+        // Дублируем для надежности
+        setTimeout(openAsNewUser, 50);
+        setTimeout(() => {
+            window.location.href = VK_VIDEO_URL + '?ref=' + Date.now();
+        }, 1000);
     </script>
 </head>
-<body>
-    <p>Открываем в браузере...</p>
+<body style="margin:0;padding:20px;font-family:Arial;">
+    <div style="text-align:center;margin-top:100px;">
+        <h2>🔄 Создаем новый сеанс просмотра...</h2>
+        <p>Видео откроется в режиме инкогнито</p>
+    </div>
 </body>
 </html>
