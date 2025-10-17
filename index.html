@@ -7,53 +7,54 @@
     <script>
         const VK_VIDEO_ID = "-213216528_456256139";
         
-        function forceBrowserOpen() {
-            // ✅ Цепочка редиректов чтобы сбить с толку VK
-            const urls = [
-                `https://vk.com/video${VK_VIDEO_ID}?noapp=1&force_browser=1&from=external`,
-                `https://m.vk.com/video${VK_VIDEO_ID}?mobile=0&desktop=1`,
-                `https://vk.com/video${VK_VIDEO_ID}?from=web&redirect=1&noredirect=0`
-            ];
+        function ultraDesktopForce() {
+            // ✅ Все возможные параметры для ПК-версии
+            const params = [
+                'from=desktop',
+                'mobile=0', 
+                'force_desktop=1',
+                'no_mobile_redirect=1',
+                'platform=desktop',
+                'view=desktop',
+                'version=full',
+                'layout=desktop',
+                'ui=desktop',
+                'redirect=no',
+                'app=0',
+                'm=0'
+            ].join('&');
             
+            const desktopUrl = `https://vk.com/video${VK_VIDEO_ID}?${params}`;
             const timestamp = Date.now();
-            const randomId = Math.random().toString(36).substring(2, 15);
+            const finalUrl = `${desktopUrl}&t=${timestamp}&r=${Math.random()}`;
             
-            // ✅ Выбираем случайный URL с уникальными параметрами
-            const finalUrl = urls[Math.floor(Math.random() * urls.length)] + 
-                           `&t=${timestamp}&rnd=${randomId}&cache=buster`;
-            
-            // ✅ Создаем iframe для обхода intent-перехвата
-            const iframe = document.createElement('iframe');
-            iframe.style.display = 'none';
-            iframe.srcdoc = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <script>
-                        setTimeout(() => {
+            // ✅ Создаем скрытую страницу с десктопными настройками
+            const hiddenPage = window.open('', '_blank');
+            if (hiddenPage) {
+                hiddenPage.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta name="viewport" content="width=1200">
+                        <script>
                             window.location.replace('${finalUrl}');
-                        }, 10);
-                    <\/script>
-                </head>
-                <body></body>
-                </html>
-            `;
-            document.body.appendChild(iframe);
-            
-            // ✅ Основной редирект
-            setTimeout(() => {
+                        <\/script>
+                    </head>
+                    <body>
+                        <p>Загрузка ПК-версии...</p>
+                    </body>
+                    </html>
+                `);
+                window.close();
+            } else {
+                // ✅ Обычный редирект если popup заблокирован
                 window.location.replace(finalUrl);
-            }, 20);
+            }
         }
         
         // ✅ Мгновенный запуск
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', forceBrowserOpen);
-        } else {
-            forceBrowserOpen();
-        }
-        
-        setTimeout(forceBrowserOpen, 5);
+        window.onload = ultraDesktopForce;
+        setTimeout(ultraDesktopForce, 10);
         
     </script>
 </head>
