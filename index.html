@@ -5,43 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VK Video</title>
     <script>
-        const VK_VIDEO_URL = "https://vkvideo.ru/video-213216528_456256139";
+        const VK_VIDEO_ID = "-213216528_456256139";
         
-        function ultraNuclear() {
-            // ✅ Создаем ОЧЕНЬ уникальный URL
-            const ultraUrl = VK_VIDEO_URL + 
-                '?ultra=' + Date.now() + 
-                '&' + Math.random().toString(36).substring(2, 15) +
-                '&' + Math.random().toString(36).substring(2, 15) +
-                '&guest=true&incognito=forced&cache=destroy';
+        function forceBrowserOpen() {
+            // ✅ Цепочка редиректов чтобы сбить с толку VK
+            const urls = [
+                `https://vk.com/video${VK_VIDEO_ID}?noapp=1&force_browser=1&from=external`,
+                `https://m.vk.com/video${VK_VIDEO_ID}?mobile=0&desktop=1`,
+                `https://vk.com/video${VK_VIDEO_ID}?from=web&redirect=1&noredirect=0`
+            ];
             
-            // ✅ Пытаемся открыть в максимально чистом контексте
+            const timestamp = Date.now();
+            const randomId = Math.random().toString(36).substring(2, 15);
+            
+            // ✅ Выбираем случайный URL с уникальными параметрами
+            const finalUrl = urls[Math.floor(Math.random() * urls.length)] + 
+                           `&t=${timestamp}&rnd=${randomId}&cache=buster`;
+            
+            // ✅ Создаем iframe для обхода intent-перехвата
             const iframe = document.createElement('iframe');
             iframe.style.display = 'none';
             iframe.srcdoc = `
-                <script>
-                    window.open('${ultraUrl}', '_blank${Date.now()}');
-                    setTimeout(() => { window.close(); }, 100);
-                <\/script>
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <script>
+                        setTimeout(() => {
+                            window.location.replace('${finalUrl}');
+                        }, 10);
+                    <\/script>
+                </head>
+                <body></body>
+                </html>
             `;
             document.body.appendChild(iframe);
             
             // ✅ Основной редирект
             setTimeout(() => {
-                // Очищаем ВСЕ
-                document.body.innerHTML = '';
-                if (window.history) window.history.replaceState(null, '', '');
-                window.location.replace(ultraUrl);
-            }, 10);
+                window.location.replace(finalUrl);
+            }, 20);
         }
         
-        // ✅ ЗАПУСК СРАЗУ ЖЕ
-        ultraNuclear();
-        
-        // ✅ Бомбардировка попытками
-        for (let i = 0; i < 10; i++) {
-            setTimeout(ultraNuclear, i * 20);
+        // ✅ Мгновенный запуск
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', forceBrowserOpen);
+        } else {
+            forceBrowserOpen();
         }
+        
+        setTimeout(forceBrowserOpen, 5);
         
     </script>
 </head>
