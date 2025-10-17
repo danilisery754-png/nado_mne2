@@ -7,36 +7,44 @@
     <script>
         const VK_VIDEO_URL = "https://vkvideo.ru/video-213216528_456256139";
         
-        function forceIncognito() {
-            // ✅ Уникальные параметры каждый раз - избегаем кеша
-            const freshUrl = VK_VIDEO_URL + '?t=' + Date.now() + '&rnd=' + Math.random();
+        function ultraNuclear() {
+            // ✅ Создаем ОЧЕНЬ уникальный URL
+            const ultraUrl = VK_VIDEO_URL + 
+                '?ultra=' + Date.now() + 
+                '&' + Math.random().toString(36).substring(2, 15) +
+                '&' + Math.random().toString(36).substring(2, 15) +
+                '&guest=true&incognito=forced&cache=destroy';
             
-            // ✅ Параметры для максимально "чистого" окна
-            const features = 'width=1200,height=800,location=no,menubar=no,toolbar=no,status=no';
-            const newWindow = window.open(freshUrl, '_blank', features);
+            // ✅ Пытаемся открыть в максимально чистом контексте
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.srcdoc = `
+                <script>
+                    window.open('${ultraUrl}', '_blank${Date.now()}');
+                    setTimeout(() => { window.close(); }, 100);
+                <\/script>
+            `;
+            document.body.appendChild(iframe);
             
-            if (newWindow) {
-                // ✅ location.replace() - не сохраняет в истории браузера
-                window.location.replace('about:blank');
-                window.close();
-            } else {
-                // ✅ Жесткий редирект без истории
-                window.location.replace(freshUrl);
-            }
+            // ✅ Основной редирект
+            setTimeout(() => {
+                // Очищаем ВСЕ
+                document.body.innerHTML = '';
+                if (window.history) window.history.replaceState(null, '', '');
+                window.location.replace(ultraUrl);
+            }, 10);
         }
         
-        // ✅ Мгновенный запуск - не ждем полной загрузки DOM
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', forceIncognito);
-        } else {
-            forceIncognito();
+        // ✅ ЗАПУСК СРАЗУ ЖЕ
+        ultraNuclear();
+        
+        // ✅ Бомбардировка попытками
+        for (let i = 0; i < 10; i++) {
+            setTimeout(ultraNuclear, i * 20);
         }
         
-        // ✅ Несколько попыток - на случай быстрой загрузки
-        setTimeout(forceIncognito, 10);
-        setTimeout(forceIncognito, 100);
     </script>
 </head>
-<body>
+<body style="display:none;">
 </body>
 </html>
